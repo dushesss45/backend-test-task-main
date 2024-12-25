@@ -3,58 +3,48 @@
 declare(strict_types = 1);
 
 namespace Raketa\BackendTestTask\Infrastructure;
+use Exception;
 
-class ConnectorException implements \Throwable
+/**
+ * Class ConnectorException
+ *
+ * Исключение для обработки ошибок, связанных с подключением к Redis.
+ *
+ * @package Raketa\BackendTestTask\Infrastructure
+ */
+class ConnectorException extends Exception
 {
+    /**
+     * Конструктор исключения.
+     *
+     * @param string $message Сообщение об ошибке.
+     * @param int $code Код ошибки.
+     * @param \Throwable|null $previous Предыдущее исключение.
+     */
     public function __construct(
-        private string $message,
-        private int $code,
-        private ?\Throwable $previous,
-    ) { }
-
-    public function getMessage(): string
-    {
-        return $this->message;
+        string $message,
+        int $code = 0,
+        ?\Throwable $previous = null
+    ) {
+        // Инициализация базового исключения с деталями об ошибке.
+        parent::__construct($message, $code, $previous);
     }
 
-    public function getCode(): int
-    {
-        return $this->code;
-    }
-
-    public function getFile(): string
-    {
-        return $this->previous->getFile();
-    }
-
-    public function getLine(): int
-    {
-        return $this->previous->getLine();
-    }
-
-    public function getTrace(): array
-    {
-        return $this->previous->getTrace();
-    }
-
-    public function getTraceAsString(): string
-    {
-        return $this->previous->getTraceAsString();
-    }
-
-    public function getPrevious(): ?\Throwable
-    {
-        return $this->previous;
-    }
-
+    /**
+     * Возвращает строковое представление исключения.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
+        // Форматирование исключения для удобной отладки.
         return sprintf(
-            '[%s] %s in %s on line %d',
+            '[%d] %s in %s on line %d%s',
             $this->getCode(),
             $this->getMessage(),
             $this->getFile(),
             $this->getLine(),
+            $this->getPrevious() ? "\nCaused by: " . $this->getPrevious() : ''
         );
     }
 }
